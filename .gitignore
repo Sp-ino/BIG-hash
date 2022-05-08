@@ -1,0 +1,5 @@
+*.exe
+*.pyc
+*.a
+*.o
+*.code-workspace
