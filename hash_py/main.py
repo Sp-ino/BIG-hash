@@ -6,8 +6,13 @@ Licensed under GNU license
 """
 
 
+import functions as f 
+
+
+INPUT = b"aouvbajfaefja"
+
 def main():
-    pass
+    f.preprocess(INPUT)
 
 
 if __name__ == "__main__":
