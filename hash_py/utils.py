@@ -1,9 +1,30 @@
-def debug_print_chunks(chunks: list) -> None:
-    for idx, byte in enumerate(chunks):
-        if idx % 512 == 0:
-            print(f"\n\nChunk {idx//512}:") 
-        if idx % 8 == 0:
-            print(f"\nRow {idx//8} ")
+## String to array of bit
 
-        print(f"{hex(byte)}\t", end="")
+def get_bits(m):
+    unicode = [ord(c) for c in m]
+    bytes = []
+    bits = []
+    for char in unicode:
+        bytes.append(bin(char)[2:].zfill(8))
+
+    for byte in bytes:
+        for bit in byte:
+            bits.append(int(bit))
+    
+    return bits
+
+## Add zeros at the end of the array
+def fillzeros(bits, lenght):
+    for i in range(len(bits), lenght):
+        bits.append(0)
+    
+    return bits
+
+# split in chunks
+def chunker (bits, chunk_lenght):
+    chunked = []
+    for b in range(0, len(bits), chunk_lenght):
+        chunked.append(bits[b:b+chunk_lenght])
+    
+    return chunked
 
