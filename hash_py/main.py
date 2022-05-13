@@ -9,10 +9,10 @@ Licensed under GNU license
 import functions as f 
 
 
-INPUT = b"aouvbajfaefja"
+INPUT = b"ciaozziadoivnraonisifjfffffffffffffffffffffffffffffffffffffffffffffffffffff"
 
 def main():
-    f.preprocess(INPUT)
+    n_chunks, chunks = f.preprocess(INPUT)
 
 
 if __name__ == "__main__":

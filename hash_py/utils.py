@@ -5,5 +5,5 @@ def debug_print_chunks(chunks: list) -> None:
         if idx % 8 == 0:
             print(f"\nRow {idx//8} ")
 
-        print(f"{hex(byte.value)}\t", end="")
+        print(f"{hex(byte)}\t", end="")
 
