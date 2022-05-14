@@ -13,13 +13,6 @@ def get_bits(m):
     
     return bits
 
-## Add zeros at the end of the array
-def fillzeros(bits, lenght):
-    for i in range(len(bits), lenght):
-        bits.append(0)
-    
-    return bits
-
 # split in chunks
 def chunker (bits, chunk_lenght):
     chunked = []
