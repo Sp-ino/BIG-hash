@@ -1,4 +1,4 @@
 # BIG-hash
-Project for implementing SHA-256 on FPGA
+Implementing SHA-256 on FPGA
 
 - hash_py contains a preliminary implementation of SHA-256
