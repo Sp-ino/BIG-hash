@@ -1,12 +1,12 @@
-from torch import chunk
-from utils import debug_print_chunks
 import numpy as np
+from utils import append_bytes, append_ulong, uint8_to_uint32
 
 
 
 # Parameters
 CHUNK_LEN = 512
 CHUNK_LEN_BYTES = CHUNK_LEN//8
+CHUNK_LEN_UINT32 = CHUNK_LEN//32
 
 # Hash constants
 HCONSTANTS = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]
@@ -23,8 +23,7 @@ RCONSTANTS = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f1
 
 
 
-
-def preprocess(input: bytes):
+def preprocess(input: bytes) -> tuple[np.ndarray, int]:
     """
     This function takes a bytes object
     as input and performs the necessary
@@ -33,43 +32,52 @@ def preprocess(input: bytes):
     and the final number of chunks.
     """
 
-    # Convert input to list of uint8
-    input_bytes = []
-    input_bytes = np.array(input)
-    input_bytes = np.array(bytearray(input_bytes))
+    # Convert input to list of uint8 and save original length in bytes
+    input_bytes = np.array(bytearray(input))
+    input_bytes_len = input_bytes.shape[0]
 
-    #Append a 0x80 byte
-    input_bytes = np.concatenate((input_bytes, np.array([0x80], dtype=np.uint8)), axis=0)
+    # Compute number of 0x00 bytes to append
+    n_padding_zeros = CHUNK_LEN_BYTES - (input_bytes_len + 9) % CHUNK_LEN_BYTES
+ 
+    # Append the necessary bytes
+    input_bytes = append_bytes(input_bytes, n_padding_zeros)
+    
+    # Append length of original string as uint64
+    input_bytes = append_ulong(input_bytes, input_bytes_len)
+ 
+    return input_bytes
 
-    # Compute number of 0x00 bytes to append and append them
-    input_bytes_len = len(input_bytes)
-    input_bytes_original_len = input_bytes_len - 1
-    n_padding_zeros = CHUNK_LEN_BYTES - (input_bytes_len + 8) % CHUNK_LEN_BYTES
-    for idx in range(n_padding_zeros):
-        input_bytes = np.concatenate((input_bytes, np.array([0x00], dtype=np.uint8)), axis=0)
 
-    # Append length of original input as an unsigned long int (8 bytes) to input_bytes
-    for idx in range(8):
-        byte_to_append = input_bytes_original_len >> 8*(7 - idx)
-        byte_to_append = np.array([byte_to_append], dtype=np.uint8)
-        input_bytes = np.concatenate((input_bytes, byte_to_append), axis=0)
+
+def create_message_schedule(input_bytes: list) -> tuple[np.array, int]:
+    len = input_bytes.shape[0]
+    new_len = len//4
+    new_input_bytes = np.zeros((new_len), dtype=np.uint32)
+
+    for idx in range(new_len): 
+        start = 4 * idx #need to make a get_block function that returns an n-long block from array
+        end = 4 * (idx + 1)
+        new_input_bytes[idx] = uint8_to_uint32(input_bytes[start:end])
 
     # Create a list containing chunks as separate numpy arrays
-    n_chunks = len(input_bytes)//CHUNK_LEN_BYTES
-
-    chunks = np.expand_dims(input_bytes[0:CHUNK_LEN_BYTES], axis=0)
-
-    for idx in range(1,n_chunks):
-        start = idx * CHUNK_LEN_BYTES
-        end = (idx + 1) * CHUNK_LEN_BYTES
-        chunk = np.expand_dims(input_bytes[start:end], axis=0)
-        chunks = np.concatenate((chunks, chunk), axis=0)
-
+    n_chunks = new_input_bytes.shape[0]//CHUNK_LEN_UINT32
+    chunks = np.expand_dims(new_input_bytes[0:CHUNK_LEN_UINT32], axis=0)
     print(chunks)
 
-    return n_chunks, chunks
+    for idx in range(1, n_chunks):
+        start = CHUNK_LEN_UINT32 * idx
+        end = CHUNK_LEN_UINT32 * (idx + 1)
+        chunk = np.expand_dims(new_input_bytes[start:end], axis=0)
+        chunks = np.concatenate((chunks, chunk), axis=0)
+
+    return chunks, n_chunks
 
 
 
-def create_message_schedule(chunks: list, n_chunks: int) -> np.array:
+def schedule_loop():
+    pass
+
+
+
+def hash_loop():
     pass
