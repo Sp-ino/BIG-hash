@@ -1,3 +1,4 @@
+from hashlib import new
 import numpy as np
 from utils import append_bytes, append_ulong, uint8_to_uint32
 
@@ -50,23 +51,29 @@ def preprocess(input: bytes) -> tuple[np.ndarray, int]:
 
 
 def create_message_schedule(input_bytes: list) -> tuple[np.array, int]:
+    """
+    Creates the message schedule for SHA256.
+    The function takes the input array of bytes
+    and transforms it into a (n_chunk, chunk_len)
+    array of chunks containing 16 uint32 values
+    each.
+    """
     len = input_bytes.shape[0]
     new_len = len//4
     new_input_bytes = np.zeros((new_len), dtype=np.uint32)
 
-    for idx in range(new_len): 
-        start = 4 * idx #need to make a get_block function that returns an n-long block from array
-        end = 4 * (idx + 1)
+    for idx in range(new_len):
+        start = 4 * idx
+        end = 4 * (idx+1)
         new_input_bytes[idx] = uint8_to_uint32(input_bytes[start:end])
 
     # Create a list containing chunks as separate numpy arrays
     n_chunks = new_input_bytes.shape[0]//CHUNK_LEN_UINT32
     chunks = np.expand_dims(new_input_bytes[0:CHUNK_LEN_UINT32], axis=0)
-    print(chunks)
 
     for idx in range(1, n_chunks):
         start = CHUNK_LEN_UINT32 * idx
-        end = CHUNK_LEN_UINT32 * (idx + 1)
+        end = CHUNK_LEN_UINT32 * (idx+1)
         chunk = np.expand_dims(new_input_bytes[start:end], axis=0)
         chunks = np.concatenate((chunks, chunk), axis=0)
 

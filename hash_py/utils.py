@@ -58,7 +58,5 @@ def uint8_to_uint32(arr: np.ndarray) -> np.ndarray:
         partial = np.uint32(byte)
         partial = partial << 8 * (3 - idx)
         out += np.array([partial], dtype=np.uint32)
-
-    # print(hex(out[0]))
     
     return out
