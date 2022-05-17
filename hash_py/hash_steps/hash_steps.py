@@ -1,6 +1,5 @@
-from hashlib import new
 import numpy as np
-from utils import append_bytes, append_ulong, uint8_to_uint32
+from hash_steps.utils import append_bytes, append_ulong, compression_step, fill_schedule_values, uint8_to_uint32
 
 
 
@@ -10,10 +9,10 @@ CHUNK_LEN_BYTES = CHUNK_LEN//8
 CHUNK_LEN_UINT32 = CHUNK_LEN//32
 
 # Hash constants
-HCONSTANTS = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]
+HASH_CONSTANTS = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]
 
 # Round constants
-RCONSTANTS = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+ROUND_CONSTANTS = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
               0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
               0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
               0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
@@ -80,18 +79,31 @@ def create_message_schedule(input_bytes: list) -> tuple[np.array, int]:
     zeros = np.zeros((n_chunks, 48), dtype=np.uint32)
     chunks = np.concatenate((chunks, zeros), axis=1)
 
-
+    for idx, chunk in enumerate(chunks):
+        chunks[idx][:] = fill_schedule_values(chunk)
 
     return chunks, n_chunks
 
 
 
-def chunk_loop():
-    pass
+def compress(chunks: np.ndarray, n_chunks: int) -> np.ndarray:
+    """
+    This function executes the
+    compression loop on the input,
+    which must be a numpy array
+    of shape (n_chunks, 64) containing
+    uint32 values.
+    """
 
+    accumulator = np.array(HASH_CONSTANTS)
+    hash_constants = np.array(HASH_CONSTANTS)
+    round_constants = np.array(ROUND_CONSTANTS)
 
+    for chunk in chunks:
+        accumulator = compression_step(h=accumulator, w=chunk, k=round_constants)
+        accumulator = accumulator + hash_constants
 
-def compression_loop():
-    pass
+    return accumulator
+    
 
-
+    

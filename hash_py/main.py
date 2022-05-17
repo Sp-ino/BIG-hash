@@ -5,15 +5,15 @@ Copyright (c) 2022 Valerio Spinogatti
 Licensed under GNU license
 """
 
-import functions as f 
+from hash_steps.hash_steps import compress, preprocess, create_message_schedule
 
 
 INPUT = b"ciaozzi"
 
 def main():
-    input_bytes = f.preprocess(INPUT)
-    chunks, n_chunks = f.create_message_schedule(input_bytes)
-
+    input_bytes = preprocess(INPUT)
+    chunks, n_chunks = create_message_schedule(input_bytes)
+    accumulated_values = compress(chunks, n_chunks)
 
 if __name__ == "__main__":
     main()
