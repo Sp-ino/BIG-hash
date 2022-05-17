@@ -15,6 +15,5 @@ def main():
     chunks, n_chunks = f.create_message_schedule(input_bytes)
 
 
-
 if __name__ == "__main__":
     main()

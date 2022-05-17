@@ -54,9 +54,8 @@ def create_message_schedule(input_bytes: list) -> tuple[np.array, int]:
     """
     Creates the message schedule for SHA256.
     The function takes the input array of bytes
-    and transforms it into a (n_chunk, chunk_len)
-    array of chunks containing 16 uint32 values
-    each.
+    and transforms it into a (n_chunk, 64)
+    array of chunks containing uint32 values.
     """
     len = input_bytes.shape[0]
     new_len = len//4
@@ -77,14 +76,22 @@ def create_message_schedule(input_bytes: list) -> tuple[np.array, int]:
         chunk = np.expand_dims(new_input_bytes[start:end], axis=0)
         chunks = np.concatenate((chunks, chunk), axis=0)
 
+    # Now add 48 word initialized to 0 to each chunks
+    zeros = np.zeros((n_chunks, 48), dtype=np.uint32)
+    chunks = np.concatenate((chunks, zeros), axis=1)
+
+
+
     return chunks, n_chunks
 
 
 
-def schedule_loop():
+def chunk_loop():
     pass
 
 
 
-def hash_loop():
+def compression_loop():
     pass
+
+
