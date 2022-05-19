@@ -2,7 +2,7 @@ import numpy as np
 
 
 
-def rightrotate(a: np.uint32, amount: int) -> np.uint32:
+def rightrotate(a: np.uint32, amount: int) -> int:
     
     if amount > 32:
         raise OSError("amount must be <= 32")
@@ -29,13 +29,12 @@ def add_mod_2tothe32(*args) -> np.uint32:
 
 
 def debug_print_chunks(chunks: np.ndarray) -> None:
-    for idx, byte in enumerate(chunks):
-        if idx % 512 == 0:
-            print(f"\n\nChunk {idx//512}:") 
-        if idx % 8 == 0:
-            print(f"\nRow {idx//8} ")
+    for _, chunk in enumerate(chunks):
+        for byte in chunk:
+            print(f"{hex(byte)}\t", end="")
+        
+        print("\n")
 
-        print(f"{hex(byte)}\t", end="")
 
     
 def debug_print_h(h: np.ndarray) -> None:

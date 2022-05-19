@@ -1,6 +1,6 @@
 import numpy as np
 from hash_steps.substeps import append_bytes, append_num, fill_schedule_values, compression_step  
-from hash_steps.utils import add_mod_2tothe32
+from hash_steps.utils import uint8_to_uint32, add_mod_2tothe32
 
 # Parameters
 CHUNK_LEN = 512
@@ -41,29 +41,11 @@ def preprocess(input: bytes) -> tuple[np.ndarray, int]:
     # Append the necessary bytes
     input_bytes = append_bytes(input_bytes, n_padding_zeros)
     
-    # Append length of original string as uint64
-    input_bytes = append_num(input_bytes, input_bytes_len)
+    # Append length of original string in bits as uint64
+    input_bits_len = input_bytes_len * 8
+    input_bytes = append_num(input_bytes, input_bits_len)
  
     return input_bytes
-
-
-
-def uint8_to_uint32(arr: np.ndarray) -> np.ndarray:
-    """
-    Takes a numpy array of uint8 of length 4
-    and reorganizes it into an array of uint32.
-    """
-
-    if arr.shape[0] != 4 or len(arr.shape) != 1:
-        raise OSError("arr must be a np.ndarray of shape (4,)")
-
-    out = np.array([0], dtype=np.uint32)
-    for idx, byte in enumerate(arr):
-        partial = np.uint32(byte)
-        partial = partial << 8 * (3 - idx)
-        out += np.array([partial], dtype=np.uint32)
-    
-    return out
 
 
 

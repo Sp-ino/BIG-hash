@@ -10,7 +10,7 @@ from hash_steps.utils import debug_print_h
 
 
 
-INPUT = b"ciaozzi"
+INPUT = b"hello world"
 
 def main():
     input_bytes = preprocess(INPUT)
