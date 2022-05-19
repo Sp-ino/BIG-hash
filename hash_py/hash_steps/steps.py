@@ -1,7 +1,6 @@
 import numpy as np
-from hash_steps.utils import append_bytes, append_ulong, compression_step, fill_schedule_values, uint8_to_uint32
-
-
+from hash_steps.substeps import append_bytes, append_num, fill_schedule_values, compression_step  
+from hash_steps.utils import add_mod_2tothe32
 
 # Parameters
 CHUNK_LEN = 512
@@ -43,9 +42,28 @@ def preprocess(input: bytes) -> tuple[np.ndarray, int]:
     input_bytes = append_bytes(input_bytes, n_padding_zeros)
     
     # Append length of original string as uint64
-    input_bytes = append_ulong(input_bytes, input_bytes_len)
+    input_bytes = append_num(input_bytes, input_bytes_len)
  
     return input_bytes
+
+
+
+def uint8_to_uint32(arr: np.ndarray) -> np.ndarray:
+    """
+    Takes a numpy array of uint8 of length 4
+    and reorganizes it into an array of uint32.
+    """
+
+    if arr.shape[0] != 4 or len(arr.shape) != 1:
+        raise OSError("arr must be a np.ndarray of shape (4,)")
+
+    out = np.array([0], dtype=np.uint32)
+    for idx, byte in enumerate(arr):
+        partial = np.uint32(byte)
+        partial = partial << 8 * (3 - idx)
+        out += np.array([partial], dtype=np.uint32)
+    
+    return out
 
 
 
@@ -75,7 +93,7 @@ def create_message_schedule(input_bytes: list) -> tuple[np.array, int]:
         chunk = np.expand_dims(new_input_bytes[start:end], axis=0)
         chunks = np.concatenate((chunks, chunk), axis=0)
 
-    # Now add 48 word initialized to 0 to each chunks
+    # Now add 48 word initialized to 0 to each chunk
     zeros = np.zeros((n_chunks, 48), dtype=np.uint32)
     chunks = np.concatenate((chunks, zeros), axis=1)
 
@@ -95,15 +113,17 @@ def compress(chunks: np.ndarray, n_chunks: int) -> np.ndarray:
     uint32 values.
     """
 
-    accumulator = np.array(HASH_CONSTANTS)
-    hash_constants = np.array(HASH_CONSTANTS)
-    round_constants = np.array(ROUND_CONSTANTS)
+    hash_values = np.array(HASH_CONSTANTS, dtype=np.uint32)
+    round_constants = np.array(ROUND_CONSTANTS, dtype=np.uint32)
 
     for chunk in chunks:
+        accumulator = np.array(HASH_CONSTANTS, dtype=np.uint32)
         accumulator = compression_step(h=accumulator, w=chunk, k=round_constants)
-        accumulator = accumulator + hash_constants
 
-    return accumulator
+        for idx, (a, h) in enumerate(zip(accumulator, hash_values)):
+            hash_values[idx] = add_mod_2tothe32(a, h)
+
+    return hash_values
     
 
     
