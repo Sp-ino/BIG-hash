@@ -1,6 +1,6 @@
 import numpy as np
-from hash_steps.substeps import append_bytes, append_num, fill_schedule_values, compression_step  
-from hash_steps.utils import uint8_to_uint32, add_mod_2tothe32
+from bighash.substeps import append_bytes, append_num, fill_schedule_values, compression_step  
+from bighash.utils import uint8_to_uint32, add_mod_2tothe32
 
 # Parameters
 CHUNK_LEN = 512
@@ -32,7 +32,7 @@ def preprocess(input: bytes) -> tuple[np.ndarray, int]:
     """
 
     # Convert input to list of uint8 and save original length in bytes
-    input_bytes = np.array(bytearray(input))
+    input_bytes = np.array(bytearray(input, encoding="utf-8"))
     input_bytes_len = input_bytes.shape[0]
 
     # Compute number of 0x00 bytes to append
@@ -106,6 +106,18 @@ def compress(chunks: np.ndarray, n_chunks: int) -> np.ndarray:
             hash_values[idx] = add_mod_2tothe32(a, h)
 
     return hash_values
-    
 
-    
+
+
+def hexdigest(hash_values: np.ndarray) -> str:
+    """
+    Generates the digest as
+    ASCII-encoded bytes (in
+    hexadecimal)
+    """
+
+    digest = ""
+    for val in hash_values:
+        digest += format(val, '08x')
+
+    return digest
