@@ -5,6 +5,12 @@ import random
 
 
 def debug_print_chunks(chunks: np.ndarray) -> None:
+    """
+    Utility function for debug.
+    Prints each chunk in a nice
+    way.
+    """
+
     for _, chunk in enumerate(chunks):
         for byte in chunk:
             print(f"{hex(byte)}\t", end="")
@@ -14,6 +20,11 @@ def debug_print_chunks(chunks: np.ndarray) -> None:
 
     
 def debug_print_h(h: np.ndarray) -> None:
+    """
+    Utility function for debugging.
+    Prints the final 8 hash values
+    nicely."""
+
     print(f"index\tvalue")
     
     for idx, val in enumerate(h):
@@ -22,6 +33,13 @@ def debug_print_h(h: np.ndarray) -> None:
 
 
 def string_generator():
+    """
+    Utility function for testing.
+    Generates random strings to
+    be fed to the function that
+    computes the hash.
+    """
+
     # Random len
     lenght = random.randint(1, 20)
     # Generate string with random printable chars
@@ -50,6 +68,11 @@ def uint8_to_uint32(arr: np.ndarray) -> np.ndarray:
 
 
 def rightrotate(a: np.uint32, amount: int) -> int:
+    """
+    Rotates the input bitwise toward
+    the right. The input must be a
+    uint32 value.
+    """
     
     if amount > 32:
         raise OSError("amount must be <= 32")
@@ -62,7 +85,13 @@ def rightrotate(a: np.uint32, amount: int) -> int:
 
 
 
-def add_mod_2tothe32(*args) -> np.uint32:
+def add_mod_2tothe32(*args) -> int:
+    """
+    Performs the addition modulo 2^32
+    of an arbitrary number of inputs,
+    modulo 2^32.
+    """
+
     modulus = pow(2,32)
     sum = 0
 

@@ -1,4 +1,3 @@
-from audioop import add
 import numpy as np
 from bighash.utils import rightrotate, add_mod_2tothe32
 

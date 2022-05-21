@@ -1,6 +1,16 @@
+"""
+Contains the definitions of the functions that perform the
+steps required by the SHA-256 algorithm. 
+
+Copyright (c) 2022 Luca Azzinari, Daniele De Menna and Valerio Spinogatti
+Licensed under GNU license
+"""
+
 import numpy as np
 from bighash.substeps import append_bytes, append_num, fill_schedule_values, compression_step  
 from bighash.utils import uint8_to_uint32, add_mod_2tothe32
+
+
 
 # Parameters
 CHUNK_LEN = 512
@@ -27,7 +37,7 @@ def preprocess(input: bytes) -> tuple[np.ndarray, int]:
     This function takes a bytes object
     as input and performs the necessary
     preprocessing on it. Returns a list
-    containing an n X 64 dim numpy array
+    containing an (n, 64) numpy array
     and the final number of chunks.
     """
 
@@ -56,6 +66,7 @@ def create_message_schedule(input_bytes: list) -> tuple[np.array, int]:
     and transforms it into a (n_chunk, 64)
     array of chunks containing uint32 values.
     """
+
     len = input_bytes.shape[0]
     new_len = len//4
     new_input_bytes = np.zeros((new_len), dtype=np.uint32)
@@ -92,7 +103,8 @@ def compress(chunks: np.ndarray, n_chunks: int) -> np.ndarray:
     compression loop on the input,
     which must be a numpy array
     of shape (n_chunks, 64) containing
-    uint32 values.
+    uint32 values. Returns an (8,) numpy
+    array containing the final hash values.
     """
 
     hash_values = np.array(HASH_CONSTANTS, dtype=np.uint32)
@@ -113,7 +125,7 @@ def hexdigest(hash_values: np.ndarray) -> str:
     """
     Generates the digest as
     ASCII-encoded bytes (in
-    hexadecimal)
+    hexadecimal).
     """
 
     digest = ""

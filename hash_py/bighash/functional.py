@@ -15,6 +15,9 @@ def big_sha256(message: str) -> str:
     Compute the hash of the
     input string according
     to SHA-256 algorithm.
+    Returns a string that
+    represents the ASCII-encoded
+    digest in hexadecimal.
     """
     
     input_bytes = preprocess(message)

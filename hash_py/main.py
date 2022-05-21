@@ -1,5 +1,5 @@
 """
-A python implementation of SHA-256
+Test script for our python implementation of SHA-256
 
 Copyright (c) 2022 Luca Azzinari, Daniele De Menna and Valerio Spinogatti
 Licensed under GNU license
@@ -12,6 +12,13 @@ from hashlib import sha256
 
 
 def test():
+    """
+    Test function that verifies
+    the proper functionality of
+    our implementation of SHA-256,
+    that is, the big_sha256 function.
+    """
+
     # counter for wrong hashes
     print("[*] Starting the BIG test")
     counter = 0
